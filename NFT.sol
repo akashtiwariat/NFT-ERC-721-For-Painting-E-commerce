@@ -2,8 +2,6 @@
 
 pragma solidity >=0.4.16 <0.9.0;
 
-
-
 contract NFT_for_Painting_ERC_721 {
 
     struct Painting {
@@ -15,7 +13,7 @@ contract NFT_for_Painting_ERC_721 {
         bool sold;
     }
 
-     Painting[] public painting;
+    Painting[] public painting;
     mapping (uint256 => bool) public paintingIds;
     mapping (uint256 => address) public tokenOwner;
     mapping (address => uint256) public ownershipTokenCount;
@@ -26,7 +24,7 @@ contract NFT_for_Painting_ERC_721 {
     event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
     event PaintingListed(uint256 indexed id, string name, string description, uint256 price, address seller);
 
-
+  // Anyone Can come and list the product that they want to sell.
    function listPainting(uint _paintingiD,string memory _name, string memory _description, uint256 _price) public {
          require(!paintingIds[_paintingiD], "Painting ID already exists");
         uint256 newTokenId = _paintingiD;
@@ -36,8 +34,8 @@ contract NFT_for_Painting_ERC_721 {
         mint(msg.sender, newTokenId);
         emit PaintingListed(newTokenId, _name, _description, _price, msg.sender);
     }
-
-    function buyPainting(uint256 _paintingId,uint _price) public payable {
+    //Buyer can come and make payment for that and buy it.
+   function buyPainting(uint256 _paintingId,uint _price) public payable {
     require(tokenOwner[_paintingId] != address(0), "Token does not exist");
     require(tokenOwner[_paintingId] != msg.sender, "You already own this token");
     require(painting[_paintingId].price == msg.value, "Incorrect payment amount");
@@ -48,14 +46,14 @@ contract NFT_for_Painting_ERC_721 {
 
     // Update painting and NFT ownership
     painting[_paintingId].sold = true;
-    transfer(msg.sender, _paintingId);
+    transfer(payable(msg.sender), _paintingId);
 
     // Mint NFT for the painting
     mint(msg.sender, _paintingId);
 }
 
 
-
+//Automatically a NFT will be minted for that partiular asset and ownership of that NFT will be transferred to the Buyer.
     function mint(address _to, uint256 _tokenId) public {
         require(_to != address(0), "Invalid address");
         require(tokenOwner[_tokenId] == address(0), "Token already exists");
